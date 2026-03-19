@@ -116,5 +116,5 @@ elif page == "📊 Dashboard":
 
 elif page == "📝 Grocery List":
     st.title("🛒 Smart Grocery List")
-    st.file_uploader("📸 Scan Handwritten List (Pillow enabled)", type=['jpg', 'png'])
+    st.file_uploader("📸 Scan Handwritten List (Pillow enabled)", type=['jpg', 'png']) 
     
