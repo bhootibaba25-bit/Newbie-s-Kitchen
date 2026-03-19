@@ -1,9 +1,7 @@
 import streamlit as st
+import streamlit as st
 import sqlite3
 import random
-import io
-from gtts import gTTS
-from PIL import Image
 
 # --- 1. MATTE SAGE & CHARCOAL UI ---
 st.set_page_config(page_title="Newbie's Kitchen", layout="wide")
@@ -46,8 +44,6 @@ def init_db():
     cursor.execute("SELECT count(*) FROM recipes")
     if cursor.fetchone()[0] < 50:
         cursor.execute("DELETE FROM recipes")
-        
-        # Featured Recipes
         base_data = [
             ('Khaman Dhokla', 'besan,curd,mustard', 160, 6, 25, 'Indian', 'Gujarati', 'Medium', 'https://images.unsplash.com/photo-1626132647523-66f5bf380027'),
             ('Puran Poli', 'chana dal,jaggery,flour,ghee', 350, 8, 65, 'Indian', 'Maharashtrian', 'Hard', 'https://images.unsplash.com/photo-1626132647523-66f5bf380027'),
@@ -55,8 +51,6 @@ def init_db():
             ('Margherita Pizza', 'dough,tomato,mozzarella', 800, 30, 100, 'Italian', 'Classic', 'Medium', 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3'),
             ('Croissant', 'flour,butter,yeast', 400, 6, 45, 'French', 'Pastry', 'Hard', 'https://images.unsplash.com/photo-1555507036-ab1f4038808a')
         ]
-        
-        # Expanded List Logic
         for i in range(112):
             b = random.choice(base_data)
             cursor.execute("INSERT INTO recipes VALUES (?,?,?,?,?,?,?,?,?)", 
@@ -68,19 +62,12 @@ db_conn = init_db()
 
 # --- 3. UI NAVIGATION ---
 st.sidebar.title("🍳 Newbie's Kitchen")
-page = st.sidebar.radio("Navigate", ["📊 Dashboard", "🔍 Recipe Finder", "👤 Diet Planner", "📝 Grocery List"])
-
-def speak(text):
-    tts = gTTS(text=text, lang='en')
-    audio_data = io.BytesIO()
-    tts.write_to_fp(audio_data)
-    return audio_data
+page = st.sidebar.radio("Navigate", ["📊 Dashboard", "🔍 Recipe Finder", "👤 Diet Planner"])
 
 if page == "🔍 Recipe Finder":
     st.title("🌍 World Recipe Finder")
     search = st.text_input("🔍 Search 100+ recipes...").lower()
     
-    # Filter Logic
     c1, c2 = st.columns(2)
     with c1: cuis = st.selectbox("Cuisine", ["All", "Indian", "Italian", "French"])
     with c2: diff = st.selectbox("Difficulty", ["All", "Easy", "Medium", "Hard"])
@@ -98,23 +85,16 @@ if page == "🔍 Recipe Finder":
                 <span class="badge">{r[6]} • {r[5]}</span>
                 <h3>{r[0]}</h3>
                 <p><b>Ingredients:</b> {r[1]}</p>
+                <p>💪 {r[3]}g Protein | 🔥 {r[2]} kcal</p>
                 </div>''', unsafe_allow_html=True)
             st.image(r[8], use_container_width=True)
-            if st.button(f"🔊 Read Ingredients for {r[0]}", key=f"v_{r[0]}"):
-                st.audio(speak(f"Ingredients are {r[1]}"), format='audio/mp3')
 
 elif page == "👤 Diet Planner":
     st.title("💪 Personalized Diet Planner")
-    age = st.number_input("Age", value=20)
     weight = st.number_input("Weight (kg)", value=70)
-    cals = weight * 30
-    st.info(f"Your target: {cals} Calories per day for a healthy body!")
+    st.info(f"Target: {weight * 30} Calories per day!")
 
 elif page == "📊 Dashboard":
     st.title("🏡 My Kitchen Dashboard")
     st.write("Welcome back, Boss!")
-
-elif page == "📝 Grocery List":
-    st.title("🛒 Smart Grocery List")
-    st.file_uploader("📸 Scan Handwritten List (Pillow enabled)", type=['jpg', 'png']) 
     
