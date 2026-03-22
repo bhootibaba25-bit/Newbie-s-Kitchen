@@ -167,18 +167,42 @@ st.sidebar.title("🍳 NEWBIE'S KITCHEN")
 page = st.sidebar.radio("NAVIGATE", ["📊 DASHBOARD", "🎯 PRECISION MATCHER", "🌍 GLOBAL EXPLORER", "🛒 GROCERY LIST", "👤 DIET PLANNER"])
 
 # --- DASHBOARD ---
-if page == "📊 DASHBOARD":
-    st.title("🏡 Dashboard")
-    items = db_conn.cursor().execute("SELECT rowid, item, expiry, qty FROM pantry ORDER BY expiry ASC").fetchall()
-    for s in items:
-        days = (datetime.strptime(s[2], '%Y-%m-%d').date() - date.today()).days
-        c_i, c_d = st.columns([5, 1])
-        c_i.write(f"**{s[1].upper()}** ({s[3]}) | {days} days left")
-        if c_d.button("🗑️", key=f"del_{s[0]}"):
-            db_conn.cursor().execute("DELETE FROM pantry WHERE rowid=?", (s[0],))
-            db_conn.commit()
-            st.rerun()
 
+# --- PAGE: DASHBOARD (RESTORED ADD OPTION) ---
+if page == "📊 DASHBOARD":
+    st.title("🏡 My Dashboard")
+    
+    # RESTORED: Manual Entry Box
+    with st.expander("➕ Quick Add to Stock"):
+        c1, c2, c3 = st.columns(3)
+        it = c1.text_input("Item Name (e.g. Milk, Flour)")
+        qt = c2.text_input("Quantity (e.g. 2L, 1kg)")
+        ex = c3.date_input("Expiry Date", min_value=date.today())
+        if st.button("Save to Pantry"):
+            if it:
+                db_conn.cursor().execute("INSERT INTO pantry VALUES (?,?,?)", (it.lower().strip(), ex, qt))
+                db_conn.commit()
+                st.success(f"Successfully added {it}!")
+                st.rerun()
+
+    st.markdown("---")
+    st.subheader("📦 My Current Inventory")
+    
+    items = db_conn.cursor().execute("SELECT rowid, item, expiry, qty FROM pantry ORDER BY expiry ASC").fetchall()
+    
+    if not items:
+        st.info("Your pantry is empty, Boss! Use the box above to add some stock.")
+    else:
+        for s in items:
+            days = (datetime.strptime(s[2], '%Y-%m-%d').date() - date.today()).days
+            color = "🔴" if days < 3 else "🟢"
+            c_i, c_d = st.columns([5, 1])
+            c_i.write(f"{color} **{s[1].upper()}** ({s[3]}) | {days} days left")
+            if c_d.button("🗑️", key=f"del_{s[0]}"):
+                db_conn.cursor().execute("DELETE FROM pantry WHERE rowid=?", (s[0],))
+                db_conn.commit()
+                st.rerun()
+                
 # --- PRECISION MATCHER ---
 elif page == "🎯 PRECISION MATCHER":
     st.title("🎯 Precision Matcher")
@@ -210,7 +234,41 @@ elif page == "🌍 GLOBAL EXPLORER":
     res = db_conn.cursor().execute(query, params).fetchall()
     for r in res:
         with st.container():
-            st.markdown(f'<div class="match-card"><span class="recipe-badge">{r[3]}</span><h3>{r[0]}</h3><p><b>Ingredients:</b> {r[1]}</p><p style="color:gray;"><b>Method:</b> {r[2]}</p></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="match-card"><span class="recipe-badge">{r[3]}# --- PAGE: DASHBOARD (RESTORED ADD OPTION) ---
+if page == "📊 DASHBOARD":
+    st.title("🏡 My Dashboard")
+    
+    # RESTORED: Manual Entry Box
+    with st.expander("➕ Quick Add to Stock"):
+        c1, c2, c3 = st.columns(3)
+        it = c1.text_input("Item Name (e.g. Milk, Flour)")
+        qt = c2.text_input("Quantity (e.g. 2L, 1kg)")
+        ex = c3.date_input("Expiry Date", min_value=date.today())
+        if st.button("Save to Pantry"):
+            if it:
+                db_conn.cursor().execute("INSERT INTO pantry VALUES (?,?,?)", (it.lower().strip(), ex, qt))
+                db_conn.commit()
+                st.success(f"Successfully added {it}!")
+                st.rerun()
+
+    st.markdown("---")
+    st.subheader("📦 My Current Inventory")
+    
+    items = db_conn.cursor().execute("SELECT rowid, item, expiry, qty FROM pantry ORDER BY expiry ASC").fetchall()
+    
+    if not items:
+        st.info("Your pantry is empty, Boss! Use the box above to add some stock.")
+    else:
+        for s in items:
+            days = (datetime.strptime(s[2], '%Y-%m-%d').date() - date.today()).days
+            color = "🔴" if days < 3 else "🟢"
+            c_i, c_d = st.columns([5, 1])
+            c_i.write(f"{color} **{s[1].upper()}** ({s[3]}) | {days} days left")
+            if c_d.button("🗑️", key=f"del_{s[0]}"):
+                db_conn.cursor().execute("DELETE FROM pantry WHERE rowid=?", (s[0],))
+                db_conn.commit()
+                st.rerun()
+                 </span><h3>{r[0]}</h3><p><b>Ingredients:</b> {r[1]}</p><p style="color:gray;"><b>Method:</b> {r[2]}</p></div>', unsafe_allow_html=True)
 
 # --- GROCERY LIST (WITH MANUAL ADD) ---
 elif page == "🛒 GROCERY LIST":
