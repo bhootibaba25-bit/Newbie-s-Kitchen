@@ -277,4 +277,4 @@ elif page == "👤 DIET PLANNER":
     w = st.number_input("Weight (kg)", 30, 150, 70)
     h = st.number_input("Height (cm)", 100, 250, 175)
     bmi = round(w / ((h/100)**2), 1)
-    st.info(f"BMI: {bmi} | Daily Intake: {int((10*w)+(6.25*h)-120)} kcal")
+    st.info(f"BMI: {bmi} | Daily Intake: {int((10*w)+(6.25*h)-120)} kcal"
